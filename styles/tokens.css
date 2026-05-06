@@ -1,0 +1,38 @@
+:root {
+  --bg:        #F5F4EF;
+  --bg-soft:   #EDEAE0;
+  --bg-mute:   #E5E1D3;
+  --bg-card:   #FBFAF5;
+  --line:      #D1C9AC;
+  --line-soft: #E6E0CB;
+  --text:      #2A2010;
+  --text-mute: #494949;
+  --text-soft: #6B6452;
+  --olive:     #8A8266;
+  --olive-soft:#A8A179;
+  --warn:      #FCD34D;
+  --accent:    #FFD23C;
+  --accent-2:  #FBD45B;
+  --teal:      #B7C8C9;
+  --teal-deep: #6B8B8C;
+  --rose:      #C97B6F;
+  --ink:       #111;
+
+  --serif: "Times New Roman", "Iowan Old Style", "Georgia", serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono:  "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --col-text:    720px;
+  --col-page:    1180px;
+  --gutter:      32px;
+  --r-card:      14px;
+  --r-chip:      999px;
+  --shadow-card: 0 1px 0 rgba(42,32,16,.04), 0 8px 24px rgba(42,32,16,.06);
+  --shadow-pop:  0 4px 20px rgba(42,32,16,.10);
+
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Intentionally not implementing dark mode for v1 to match PI's blog. */
+}

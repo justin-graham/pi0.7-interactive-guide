@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>π0.7 for Dummies — an interactive walkthrough</title>
+  <meta name="description" content="An interactive, foundational walkthrough of Physical Intelligence's π0.7 model — built so anyone can understand how a single robot policy generalizes across new tasks and new robot bodies.">
+  <meta property="og:title" content="π0.7 for Dummies">
+  <meta property="og:description" content="An interactive walkthrough of Physical Intelligence's π0.7 robotics model.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/widgets.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+  <nav class="topnav" aria-label="primary">
+    <div class="topnav-inner">
+      <a class="brand" href="#top"><span class="pi">π</span>0.7 for dummies</a>
+      <div class="links">
+        <a href="#primer">Primer</a>
+        <a href="#thesis">§1 Thesis</a>
+        <a href="#prompting">§3 Prompting</a>
+        <a href="#composition">§5 Composition</a>
+        <a href="#paper">§8 Paper</a>
+      </div>
+      <a class="cta" href="assets/pi07.pdf" target="_blank" rel="noopener">Read the paper →</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="eyebrow">Physical Intelligence · π0.7 · An interactive walkthrough</div>
+    <h1>One <em>generalist</em> robot model, many bodies, no fine‑tuning.</h1>
+    <p class="lede">π0.7 is Physical Intelligence's latest vision‑language‑action model. It folds a t‑shirt on a robot it was never trained on, operates an unfamiliar air fryer with the help of a few sentences, and matches per‑task RL specialists across laundry, espresso, and box assembly — all from the same set of weights.</p>
+    <p class="lede">This page walks you from <em>"what is a robot policy?"</em> all the way to the trick that makes π0.7 work: <strong>diverse contextual prompting</strong>. Every concept gets its own live widget. No robotics background needed.</p>
+    <div class="meta">
+      <span>Read time · ~25 min</span>
+      <span>·</span>
+      <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">Original blog ↗</a>
+      <span>·</span>
+      <a href="assets/pi07.pdf" target="_blank" rel="noopener">Paper PDF ↗</a>
+      <span>·</span>
+      <a href="https://www.pi.website" target="_blank" rel="noopener">pi.website ↗</a>
+    </div>
+  </header>
+
+  <!-- §0.1 What a robot policy is -->
+  <section class="s" id="primer">
+    <div class="eyebrow">§0.1 · A robot policy, in one widget</div>
+    <h2>A policy is a function. It turns what the robot sees into what the robot does.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Pick up your coffee. Your eyes catch the mug; a millisecond later your shoulder, elbow and wrist start rotating. There is something — a "policy" — mapping <em>what you see</em> to <em>how you move</em>.</p>
+        <p>For a robot the inputs are camera pixels and joint angles. The outputs are target joint angles a few hundred milliseconds into the future. The policy is the function in between.</p>
+        <p>Drag the sliders to set this toy two‑joint arm's angles directly. You're being the policy.</p>
+        <p class="takeaway">A robot policy is a learned function $\pi(a \mid o)$: given an observation $o$ (pixels + joint angles), produce an action $a$ (next joint angles).</p>
+      </div>
+      <div class="widget" data-widget="arm">
+        <div class="w-card">
+          <div class="w-eyebrow">Two‑link planar arm — you are the policy</div>
+          <canvas class="w-canvas" data-arm="canvas" aria-label="Two-joint robot arm visualization"></canvas>
+          <div class="w-row" style="margin-top:14px">
+            <label>θ₁ <input type="range" class="w-slider" data-arm="theta1" min="-180" max="180" value="-30" step="1"></label>
+            <span class="val" data-arm="theta1-val">−30°</span>
+          </div>
+          <div class="w-row">
+            <label>θ₂ <input type="range" class="w-slider" data-arm="theta2" min="-160" max="160" value="80" step="1"></label>
+            <span class="val" data-arm="theta2-val">80°</span>
+          </div>
+          <div class="w-row" style="margin-top:8px">
+            <button class="w-btn ghost" data-arm="newtarget">New target</button>
+            <span data-arm="dist" class="val">d = —</span>
+          </div>
+          <p class="w-caption">Click anywhere on the canvas to set a target. The yellow dot is what the policy is "asked" to reach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §0.2 Why this is hard -->
+  <section class="s" id="why-hard">
+    <div class="eyebrow">§0.2 · Why this is harder than it looks</div>
+    <h2>For one observation there are many valid actions.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Reach for your coffee from above; from the side; via a little curl. All three are correct. Robot data is full of this: human demonstrators picked their own paths, and the "right action" given the same image is genuinely <em>multimodal</em>.</p>
+        <p>This is why naive supervised learning struggles. If you fit a model that emits one action per observation by minimizing squared error, it averages the modes — and the average is often somewhere none of the demonstrators went.</p>
+        <p class="takeaway">Action distributions are multimodal. A policy that collapses them to a mean produces motion that is the average of two good plans, which is usually a bad plan.</p>
+      </div>
+      <div class="widget" data-widget="arm-multi">
+        <div class="w-card">
+          <div class="w-eyebrow">Three valid trajectories to the same target</div>
+          <canvas class="w-canvas" data-armmulti="canvas" aria-label="Multiple valid arm trajectories"></canvas>
+          <div class="w-row" style="margin-top:14px">
+            <label>playback <input type="range" class="w-slider" data-armmulti="t" min="0" max="100" value="0" step="1"></label>
+            <button class="w-btn ghost" data-armmulti="play">▶ play</button>
+            <button class="w-btn ghost" data-armmulti="newtarget">New target</button>
+          </div>
+          <p class="w-caption">Three different joint paths reach the same yellow target. A model that averaged them would pass through none of them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §0.3 Imitation learning -->
+  <section class="s" id="bc">
+    <div class="eyebrow">§0.3 · Imitation learning, in one chart</div>
+    <h2>Show the robot enough demos and a policy emerges. Mostly.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Behavior cloning is the simplest recipe. Record a human teleoperating the robot, store every (observation, action) pair, then train a network to predict the action from the observation.</p>
+        <p>Click on the canvas to add demonstrations. Each click is an (observation, action) pair: x is the observation, y is the action the demonstrator chose. The dashed curve is what a small model learns. The shaded band is its <em>coverage</em> — regions where it's seen enough nearby demos to be confident.</p>
+        <p>Watch what happens at the edges where you haven't clicked. The coverage thins, the curve gets nervous. That gap is where π0.7 has to do real work.</p>
+        <p class="takeaway">Imitation learning fits the demonstrators well in regions you've covered. Out‑of‑distribution observations are the hard part — and there are always more of those than you can demonstrate.</p>
+      </div>
+      <div class="widget" data-widget="bc">
+        <div class="w-card">
+          <div class="w-eyebrow">Behavior cloning · click to add demos</div>
+          <canvas class="w-canvas" data-bc="canvas" aria-label="Behavior cloning scatter and fitted curve"></canvas>
+          <div class="w-row" style="margin-top:14px">
+            <label>bandwidth <input type="range" class="w-slider" data-bc="bw" min="5" max="50" value="18" step="1"></label>
+            <span class="val" data-bc="bw-val">18</span>
+            <button class="w-btn ghost" data-bc="reset">Reset</button>
+            <button class="w-btn ghost" data-bc="seed">Seed demos</button>
+          </div>
+          <p class="w-caption">Yellow band = covered region. Outside it, the policy is guessing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §0.4 VLAs -->
+  <section class="s" id="vla">
+    <div class="eyebrow">§0.4 · Vision‑Language‑Action models</div>
+    <h2>Take a model that already understands images and language. Teach it actions.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Modern image‑and‑text models (vision‑language models, or <details class="def"><summary>VLMs</summary><span class="body">A vision‑language model is a transformer trained on (image, text) pairs from the web — it can describe images, answer questions about them, follow instructions. Think GPT‑4o or Gemini, on the multimodal side.</span></details>) already know what a "mug," a "drawer," and a "fold the t‑shirt" look like. A vision‑language‑action model — a <strong>VLA</strong> — keeps all of that, and bolts on an output head that emits robot actions instead of text.</p>
+        <p>π0.7 is a VLA. The image and the language instruction flow into a transformer. Out the other side comes a chunk of joint angles for the next ~half second.</p>
+        <p>Hover the blocks below to see what each one does.</p>
+        <p class="takeaway">A VLA is a transformer trained jointly on internet image/text and robot demonstrations. The web priors are why "open the air fryer" is a meaningful instruction at all.</p>
+      </div>
+      <div class="widget" data-widget="vla">
+        <div class="w-card">
+          <div class="w-eyebrow">VLA forward pass — hover any block</div>
+          <svg class="w-canvas" data-vla="svg" viewBox="0 0 520 280" style="aspect-ratio:520/280" aria-label="VLA architecture diagram"></svg>
+          <p class="w-caption">Pixels and the language instruction enter together; the action expert emits a chunk of continuous actions, not discrete tokens.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §0.5 Flow matching -->
+  <section class="s" id="flow">
+    <div class="eyebrow">§0.5 · From action <em>tokens</em> to <em>trajectories</em></div>
+    <h2>π‑family models predict continuous action chunks via <span style="white-space:nowrap">flow matching</span>.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>If you only emit one action at a time, the robot stutters; chunks of actions look smoother and let the model commit to a plan. But chunks live in a high‑dimensional continuous space, and we already saw that supervised regression averages modes.</p>
+        <p><details class="def"><summary>Flow matching</summary><span class="body">A way to train a generative model: start from random noise and learn a vector field that pushes noise toward data. At inference, you integrate that field over time $t \in [0,1]$ to sample. Closely related to diffusion, but with a simpler objective.</span></details> sidesteps that. Instead of predicting an action, the model learns a <em>velocity field</em> on action‑space. At inference, you start from a Gaussian blob and let the field carry you to a sample. Multiple modes? The field has multiple basins. No averaging.</p>
+        <p>Drag the slider for $t$. At $t=0$ you see noise. At $t=1$ the noise has been transported onto the data distribution. Toggle the number of modes to see the field reorganize.</p>
+        <p class="takeaway">Flow matching turns "predict an action" into "follow a learned velocity field from noise to data." Multimodal distributions are first‑class citizens.</p>
+      </div>
+      <div class="widget" data-widget="flow">
+        <div class="w-card">
+          <div class="w-eyebrow">Flow from noise → data</div>
+          <canvas class="w-canvas" data-flow="canvas" aria-label="Flow matching vector field"></canvas>
+          <div class="w-row" style="margin-top:14px">
+            <label>t <input type="range" class="w-slider" data-flow="t" min="0" max="100" value="0" step="1"></label>
+            <span class="val" data-flow="t-val">0.00</span>
+            <button class="w-btn ghost" data-flow="play">▶ animate</button>
+          </div>
+          <div class="w-row">
+            <label>modes <input type="range" class="w-slider" data-flow="modes" min="1" max="4" value="3" step="1"></label>
+            <span class="val" data-flow="modes-val">3</span>
+            <button class="w-btn ghost" data-flow="reseed">Re‑seed</button>
+          </div>
+          <p class="w-caption">Yellow dots are samples being transported. Faint arrows are the learned velocity field. Tan crosses are the data the field is trained to land on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §1 Thesis -->
+  <section class="s" id="thesis">
+    <div class="eyebrow">§1 · The thesis</div>
+    <h2>One model. Many robot bodies. No fine‑tuning.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>π0.7's headline claim is generalization across both <em>tasks</em> and <em>embodiments</em>: a single set of weights that performs new manipulation skills and runs on robots whose hardware it has never directly trained on.</p>
+        <p>The video on the right is the showcase: a t‑shirt folded by a bimanual UR5e — an industrial arm that contributed <em>zero</em> training data. PI reports the success rate matches what their expert teleoperators achieve when handed the same robot for the first time. (See the <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">blog post</a> for details.)</p>
+        <p>This is a step‑change. Earlier π‑family models — including π0.6 — were largely <em>specialists</em>: each task got its own RL fine‑tune. π0.7 keeps that quality but emits it from one generalist.</p>
+        <p class="takeaway">π0.7 is a generalist. The same checkpoint folds laundry on a new robot, makes espresso, peels vegetables, and operates an unfamiliar air fryer. The rest of the page is about <em>how</em>.</p>
+      </div>
+      <div class="widget" data-widget="thesis-video">
+        <div class="w-card">
+          <div class="w-video-wrap">
+            <span class="lbl">UR5e · zero training data on this body</span>
+            <video class="w-video" data-lazy-src="https://website.pi-asset.com/pi07/ur5_shirt_folding_with_goal_overlay_labeled_compressed.mp4" muted autoplay loop playsinline preload="none" controls></video>
+          </div>
+          <p class="w-caption">π0.7 folding a t‑shirt on a bimanual UR5e it was never trained on — overlay shows the world‑model subgoal the policy is aiming at. Video © Physical Intelligence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2 Naive recipe -->
+  <section class="s" id="naive">
+    <div class="eyebrow">§2 · The naive recipe — and why it fails</div>
+    <h2>Just dump every robot's data into one model? Try it.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>The obvious recipe for a generalist: collect demonstrations from every robot you can, mix all the data together, and train one big network. PI tried it. It does not work — and the reason is the same multimodality problem from §0.2, just <em>worse</em>.</p>
+        <p>Two robots see the same image and produce different correct actions, because their bodies are different. A wide‑gripper bimanual arm folds a shirt one way; a narrow single‑gripper does it differently. To a model with no idea which body it's controlling, this looks like one robot doing contradictory things.</p>
+        <p>Below: same observation $x$, two demonstrators producing different correct actions. Train a single‑mode regressor on the mix and it averages them — the dashed line. Toggle <em>"add a label distinguishing them"</em> and the model can finally fit both. That toggle is the entire intuition for §3.</p>
+        <p class="takeaway">Without a label saying <em>which</em> robot or <em>how</em> the task should be done, multi‑robot data looks self‑contradictory. The fix is to hand the model that label as a conditioning signal.</p>
+      </div>
+      <div class="widget" data-widget="conflict">
+        <div class="w-card">
+          <div class="w-eyebrow">Same observation, two demonstrators</div>
+          <canvas class="w-canvas" data-conflict="canvas" aria-label="Conflicting demonstrations and naive average"></canvas>
+          <label class="toggle-pill" style="margin-top:14px">
+            <input type="checkbox" data-conflict="label">
+            <span class="track"></span>
+            <span>add a label distinguishing them</span>
+          </label>
+          <p class="w-caption">Off: the model sees one mixed dataset and averages. On: it conditions on a label and fits both modes cleanly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §3 Diverse contextual prompting -->
+  <section class="s" id="prompting">
+    <div class="eyebrow">§3 · Diverse contextual prompting</div>
+    <h2>Tell the model not just <em>what</em> to do, but <em>how</em> it's being done.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>The fix in §2 — adding a "which robot" label — is the seed of π0.7's central technique. Instead of a single label, π0.7 conditions every training example on a structured bundle of context:</p>
+        <ul>
+          <li><strong>Language</strong> — a high‑level task and finer sub‑step instructions ("open the air fryer", "grasp the lid handle").</li>
+          <li><strong>Metadata</strong> — performance attributes like quality, speed, or which strategy the demonstrator used.</li>
+          <li><strong>Control modality</strong> — joint‑space vs. end‑effector targets; gripper open/close abstractions.</li>
+          <li><strong>Visual subgoals</strong> — an image of what the scene <em>should</em> look like a few hundred milliseconds from now.</li>
+        </ul>
+        <p>Toggle the chips on the right. Each combination corresponds to a slice of the training data the model would see, and changes what conditioning the policy gets at inference.</p>
+        <p class="takeaway">Diverse contextual prompting disambiguates conflicting demonstrations and lets a single network absorb data from many robots, many strategies, even human videos — without averaging them away.</p>
+      </div>
+      <div class="widget" data-widget="prompt">
+        <div class="w-card">
+          <div class="w-eyebrow">Build a prompt — see the conditioning</div>
+          <div data-prompt="chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+          <div data-prompt="preview" style="margin-top:16px"></div>
+          <p class="w-caption">Each chip toggles a piece of the conditioning π0.7 receives. The preview rotates through training‑data slices that match.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §4 World model & subgoals -->
+  <section class="s" id="subgoals">
+    <div class="eyebrow">§4 · The world model loop</div>
+    <h2>A small model paints what should happen next. The policy aims at the painting.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Among the four conditioning channels in §3, visual subgoals deserve their own section. Demonstrators rarely write down their plan; they just act. So PI trains a lightweight <em>world model</em> that, given the current frame plus a high‑level instruction, generates an image of the desired next state. The action policy is then conditioned on that synthetic image at inference.</p>
+        <p>Step through the loop on the right: observation → world‑model subgoal → action chunk → next observation. The frames are real captures from PI's blog post.</p>
+        <p>Why this helps: subgoals factor planning ("what should the scene look like in 0.5 s?") out of the action policy ("what joint motion realizes that?"). Each piece does what it's good at.</p>
+        <p class="takeaway">Visual subgoals turn an abstract instruction into a concrete pixel target. The action policy learns a much easier mapping: from <em>this image</em> to <em>this image</em>, what motion?</p>
+      </div>
+      <div class="widget" data-widget="subgoal">
+        <div class="w-card">
+          <div class="w-eyebrow">Step the world‑model loop</div>
+          <div class="w-pair">
+            <div>
+              <img data-sub="cur" alt="current frame">
+              <p class="w-caption" style="text-align:center">current</p>
+            </div>
+            <div class="arrow">→</div>
+            <div>
+              <img data-sub="goal" alt="subgoal frame">
+              <p class="w-caption" style="text-align:center">subgoal (predicted)</p>
+            </div>
+          </div>
+          <div class="w-row" style="margin-top:14px">
+            <button class="w-btn" data-sub="step">Step ▸</button>
+            <button class="w-btn ghost" data-sub="reset">Reset</button>
+            <span class="val" data-sub="idx">step 1 / 5</span>
+          </div>
+          <p class="w-caption">Frames © Physical Intelligence, hotlinked from their CDN.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §5 Compositional generalization -->
+  <section class="s" id="composition">
+    <div class="eyebrow">§5 · Compositional generalization</div>
+    <h2>Skills the model never learned together — recombined to solve new tasks.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>Once the model can absorb diverse data through diverse prompts, something interesting happens. Skills it learned in isolation — closing a drawer, pressing a button, opening a hinged lid — start <em>recombining</em> for tasks no single demonstration covered. PI's headline example is operating an <strong>air fryer</strong> the model never saw, by composing motions from training on toasters, microwaves, and other appliances.</p>
+        <p>Drag skill cards into the target slot and watch the corresponding capability tier light up. Then play the matching video to see what π0.7 actually does on the real machine.</p>
+        <p>This is a language‑model‑style emergent capability — the same way LLMs that learned French and JSON can suddenly produce French JSON without ever being trained on the combination.</p>
+        <p class="takeaway">π0.7 shows the first signs of <em>compositional</em> generalization in robotics: not just "do task X better", but "combine skills A and B for the unseen task C".</p>
+      </div>
+      <div class="widget" data-widget="compose">
+        <div class="w-card">
+          <div class="w-eyebrow">Compose a new task</div>
+          <div class="compose-board" data-compose="board">
+            <div class="compose-col" data-compose="src">
+              <h4>Skills the model trained on</h4>
+              <div class="skill" draggable="true" data-id="hinge"><span class="dot"></span> Open a hinged lid</div>
+              <div class="skill" draggable="true" data-id="press"><span class="dot"></span> Press a button</div>
+              <div class="skill" draggable="true" data-id="grasp"><span class="dot"></span> Grasp a small handle</div>
+              <div class="skill" draggable="true" data-id="place"><span class="dot"></span> Place an object inside</div>
+            </div>
+            <div class="compose-col">
+              <h4>Target task</h4>
+              <div class="compose-target" data-compose="drop">
+                <h4>Use an air fryer</h4>
+                <div data-compose="filled"><span class="slot-empty">drop skills here…</span></div>
+              </div>
+              <p class="w-caption" data-compose="tier" style="margin-top:10px">Drag at least 2 skills to see π0.7 attempt the task.</p>
+            </div>
+          </div>
+          <div class="w-video-wrap" data-compose="video-wrap" style="margin-top:14px;display:none">
+            <span class="lbl" data-compose="vidlabel">zero‑shot</span>
+            <video class="w-video" data-compose="video" muted autoplay loop playsinline preload="none" controls></video>
+          </div>
+          <p class="w-caption" style="margin-top:8px">Air‑fryer attempt videos © Physical Intelligence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §6 Distill specialists -->
+  <section class="s" id="distill">
+    <div class="eyebrow">§6 · Specialist‑level performance, in one generalist</div>
+    <h2>Distill RL specialists into the generalist with strategy metadata.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>The conventional way to get high task performance is to fine‑tune a per‑task specialist with RL. PI did exactly that — and then poured the resulting behavior back into π0.7, tagging each example with metadata describing the strategy the specialist used. The generalist matches or beats the specialists on the tasks PI evaluates.</p>
+        <p>Drag the slider to switch tasks. Bars compare a single‑task RL specialist, a naive generalist (no diverse prompting), and π0.7. The espresso bar comes with the matching demo video.</p>
+        <p class="takeaway">Specialists are no longer the ceiling. With diverse contextual prompting, the generalist matches them and keeps every other skill it had.</p>
+      </div>
+      <div class="widget" data-widget="distill">
+        <div class="w-card">
+          <div class="w-eyebrow">Specialist vs. generalist · illustrative</div>
+          <svg class="w-canvas" data-distill="svg" viewBox="0 0 520 240" style="aspect-ratio:520/240" aria-label="Bar chart comparing specialist to generalist"></svg>
+          <div class="w-row" style="margin-top:12px">
+            <label>task <input type="range" class="w-slider" data-distill="task" min="0" max="2" value="1" step="1"></label>
+            <span class="val" data-distill="task-name">Espresso</span>
+          </div>
+          <div class="w-video-wrap" data-distill="video-wrap" style="margin-top:14px">
+            <span class="lbl" data-distill="vidlabel">Espresso · π0.7 generalist</span>
+            <video class="w-video" data-distill="video" muted autoplay loop playsinline preload="none" controls></video>
+          </div>
+          <p class="w-caption">Bar values are illustrative — exact numbers in the paper. Video © Physical Intelligence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §7 What's missing -->
+  <section class="s" id="missing">
+    <div class="eyebrow">§7 · What's still missing</div>
+    <h2>An honest scorecard.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>PI is candid that π0.7 is the beginning, not the end. Compositional generalization shows up in early forms; physical generalization (new objects, surfaces, lighting) lags semantic generalization (new instructions, new task labels); and explicit "think‑then‑act" planning isn't really there yet.</p>
+        <p>The bars on the right are an editorial summary, not a benchmark — read the paper's discussion section for the precise picture. Future versions of π‑family models will likely close most of these.</p>
+        <p class="takeaway">π0.7 is a step‑change, not a finish line. Reasoning about plans, recovering from outcomes, and generalizing physically are the next problems.</p>
+      </div>
+      <div class="widget" data-widget="scorecard">
+        <div class="w-card">
+          <div class="w-eyebrow">Editorial scorecard · π0.7 capabilities</div>
+          <div class="scorecard" data-score="root"></div>
+          <p class="w-caption">An editorial reading of the paper's discussion section, not an official benchmark.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §8 Read the paper -->
+  <section class="s" id="paper">
+    <div class="eyebrow">§8 · Go deeper</div>
+    <h2>Read the paper and the originals.</h2>
+    <div class="s-grid">
+      <div class="text">
+        <p>This page is a paraphrase. The real source is PI's paper, which goes into the data mixture, the architecture, the recipe, and the full evaluation suite. It's worth reading in full if you got this far.</p>
+        <p>If you want to keep going on VLAs and robot foundation models, the links on the right are a reasonable trailhead.</p>
+      </div>
+      <div class="widget">
+        <div class="ref-card">
+          <h3 style="font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:.02em;text-transform:uppercase;color:var(--text);margin:0 0 10px">π0.7 — citation</h3>
+          <pre class="cite">@misc{pi07_2026,
+  title  = {{$\pi_{0.7}$}: A Steerable Model with Emergent Capabilities},
+  author = {Physical Intelligence},
+  year   = {2026},
+  month  = apr,
+  url    = {https://www.pi.website/blog/pi07},
+  note   = {See \texttt{pi07.pdf}}
+}</pre>
+          <div class="ref-links">
+            <a href="assets/pi07.pdf" target="_blank" rel="noopener">📄 Paper PDF</a>
+            <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">📝 Blog</a>
+            <a href="https://www.pi.website" target="_blank" rel="noopener">🔗 pi.website</a>
+            <a href="https://www.pi.website/blog/pi05" target="_blank" rel="noopener">π0.5</a>
+            <a href="https://www.pi.website/blog/pi0" target="_blank" rel="noopener">π0</a>
+          </div>
+          <p class="w-caption" style="margin-top:14px">All credit for the work belongs to Physical Intelligence. This page is a third‑party explainer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>Built as a learning artifact. Not affiliated with Physical Intelligence.</div>
+    <div>
+      <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">π0.7 blog ↗</a>
+      ·
+      <a href="assets/pi07.pdf" target="_blank" rel="noopener">PDF ↗</a>
+      ·
+      <a href="CREDITS.md" target="_blank">Credits</a>
+    </div>
+  </footer>
+
+  <div class="tooltip" id="tip" role="tooltip"></div>
+
+  <script src="scripts/util/math.js"></script>
+  <script src="scripts/util/canvas.js"></script>
+  <script src="scripts/widgets/arm.js"></script>
+  <script src="scripts/widgets/arm-multi.js"></script>
+  <script src="scripts/widgets/bc.js"></script>
+  <script src="scripts/widgets/vla-diagram.js"></script>
+  <script src="scripts/widgets/flow.js"></script>
+  <script src="scripts/widgets/conflict.js"></script>
+  <script src="scripts/widgets/prompt-builder.js"></script>
+  <script src="scripts/widgets/subgoal-loop.js"></script>
+  <script src="scripts/widgets/compose.js"></script>
+  <script src="scripts/widgets/distill-bars.js"></script>
+  <script src="scripts/widgets/scorecard.js"></script>
+  <script src="scripts/boot.js"></script>
+</body>
+</html>
