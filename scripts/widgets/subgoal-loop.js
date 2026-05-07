@@ -7,16 +7,21 @@ window.W_subgoal = function init(root) {
   const resetBtn = root.querySelector('[data-sub="reset"]');
   const idxLabel = root.querySelector('[data-sub="idx"]');
 
-  const N = 5;
-  let i = 1;
+  const pairs = (window.PI07_MEDIA && window.PI07_MEDIA.subgoals) || [];
+  const N = pairs.length || 5;
+  let i = 0;
 
   function paint() {
-    cur.src = `https://www.pi.website/images/pi07/current_${i}.png`;
-    goal.src = `https://www.pi.website/images/pi07/subgoal_${i}.png`;
-    idxLabel.textContent = `step ${i} / ${N}`;
+    const pair = pairs[i] || {
+      current: `https://www.pi.website/images/pi07/current_${i + 1}.png`,
+      goal: `https://www.pi.website/images/pi07/subgoal_${i + 1}.png`
+    };
+    cur.src = pair.current;
+    goal.src = pair.goal;
+    idxLabel.textContent = `step ${i + 1} / ${N}`;
   }
   paint();
 
-  stepBtn.addEventListener('click', () => { i = (i % N) + 1; paint(); });
-  resetBtn.addEventListener('click', () => { i = 1; paint(); });
+  stepBtn.addEventListener('click', () => { i = (i + 1) % N; paint(); });
+  resetBtn.addEventListener('click', () => { i = 0; paint(); });
 };

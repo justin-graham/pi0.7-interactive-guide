@@ -1,37 +1,46 @@
 # Credits
 
-## Source material
+## Source Material
 
 This explainer is based on Physical Intelligence's public release of π0.7:
 
-- **Blog post**: [π0.7: A Steerable Model with Emergent Capabilities](https://www.pi.website/blog/pi07) — Physical Intelligence, April 2026.
-- **Paper**: `assets/pi07.pdf` (mirrored locally with a link back to the original at https://www.pi.website/download/pi07.pdf).
+- **Blog post**: [π0.7: A Steerable Model with Emergent Capabilities](https://www.pi.website/blog/pi07), Physical Intelligence, April 16, 2026.
+- **Paper**: [π0.7 PDF](https://www.pi.website/download/pi07.pdf), mirrored locally at `assets/pi07.pdf` for the GitHub Pages site.
 
-All technical contributions, results, models, and demos are PI's. Quotes from the paper or blog post are limited to short fragments and attributed inline.
+All technical contributions, models, results, figures, and demonstrations are PI's. This site paraphrases the work and attributes PI inline where media or claims are used.
 
-## Embedded media
+The interactive π0.7 system map is a hand-redrawn, responsive adaptation of the architecture/context diagram in PI's public blog post. It is not an original PI asset and should be read as an explainer redraw.
 
-The following videos are hotlinked from PI's public CDN at `https://website.pi-asset.com/pi07/`:
+## Embedded Media
 
-- `ur5_shirt_folding_with_goal_overlay_labeled_compressed.mp4` — §1 thesis
-- `coffee_compressed.mp4` — §6 espresso
-- `cut_zucchini_compressed.mp4` — §6 vegetable peel
-- `shirt_folding_processed_no_overlay_compressed.mp4` — §6 laundry
-- `zeroshot_air_fryer_attempt_compressed.mp4` — §5 zero‑shot tier
-- `coarse_coaching_air_fryer_compressed.mp4` — §5 coarse‑coaching tier
-- `detailed_coaching_air_fryer_compressed.mp4` — §5 detailed‑coaching tier
+Videos are hotlinked from PI's public CDN at `https://website.pi-asset.com/pi07/`:
 
-The current/subgoal frame pairs (`current_1.png`…`current_5.png` and `subgoal_1.png`…`subgoal_5.png`) are hotlinked from `https://www.pi.website/images/pi07/`.
+- `Pi07VFINAL.mp4` — hero release reel
+- `zeroshot_air_fryer_attempt_compressed.mp4`
+- `coarse_coaching_air_fryer_compressed.mp4`
+- `detailed_coaching_air_fryer_compressed.mp4`
+- `vis_HL_policy_GG_air_fryer.mp4`
+- `Clippi_air_fry_compressed.mp4`
+- `Galaxea_air_fry_compressed.mp4`
+- `DROID_air_fry_compressed.mp4`
+- `ARX_shirt_fold_teleop_compressed.mp4`
+- `ur5_shirt_folding_with_goal_overlay_labeled_compressed.mp4`
+- `coffee_compressed.mp4`
+- `cucumber_peeling_compressed.mp4`
+- `PBsandwich_compressed.mp4`
+- `windex_compressed.mp4`
 
-If you are a Physical Intelligence representative and would like any of this changed or removed, open an issue.
+Subgoal frame pairs (`current_1.png` through `current_5.png` and `subgoal_1.png` through `subgoal_5.png`) are hotlinked from `https://www.pi.website/images/pi07/`.
 
 ## Inspiration
 
-- [Interactive TurboQuant](https://arkaung.github.io/interactive-turboquant/) by Arka Ung — pedagogical structure and "concept-per-section primer" pattern.
-- [cartesian.app](https://cartesian.app) — visual polish bar for single-page explainers.
+- [Interactive TurboQuant](https://arkaung.github.io/interactive-turboquant/) by Arka Ung, for the first-principles interactive explainer pattern.
+- [cartesian.app](https://cartesian.app), for the visual polish bar for single-page technical explainers.
 
-## Stack
+## Fonts And Styling
 
-- [MathJax 3](https://www.mathjax.org/) for LaTeX.
-- [D3 v7](https://d3js.org/) for the §6 grouped bar chart.
-- [Inter](https://fonts.google.com/specimen/Inter) for UI/headings; `Times New Roman, serif` for body text — matching PI's blog.
+- Source Sans 3 is loaded from Google Fonts.
+- PI's public Signifier webfont is referenced from `www.pi.website` with fallbacks.
+- Colors follow PI's public research-page palette: `#F5F4EF`, `#EEECE4`, `#E6E0CB`, `#FBD45B`, and black linework.
+
+If you represent Physical Intelligence and want any attribution or media handling changed, open an issue.

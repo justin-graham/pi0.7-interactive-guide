@@ -1,10 +1,8 @@
-# π0.7 for Dummies
+# π0.7 Interactive Guide
 
-An interactive walkthrough of Physical Intelligence's [π0.7](https://www.pi.website/blog/pi07) model — built from the ground up so a curious reader without a robotics background can follow along.
+A static, interactive guide to Physical Intelligence's [π0.7](https://www.pi.website/blog/pi07) model. It starts from robot-policy foundations and builds toward diverse contextual prompting, visual subgoals, air-fryer composition, cross-embodiment transfer, and the paper's main result claims.
 
-The page starts at "what is a robot policy?" and walks all the way to "why does diverse contextual prompting unlock compositional generalization?" with a live, hands-on widget for every concept.
-
-This is a third-party explainer. All credit for the work belongs to Physical Intelligence; this site links to and quotes their materials with attribution. See [CREDITS.md](./CREDITS.md).
+This is a third-party explainer. PI's paper, blog post, figures, models, and demo media remain the source of truth. See [CREDITS.md](./CREDITS.md).
 
 ## Run locally
 
@@ -16,4 +14,4 @@ Then open http://localhost:8000.
 
 ## Stack
 
-Plain HTML, CSS, and JavaScript. No build step. Static-deploys to GitHub Pages from `main`. MathJax for LaTeX, D3 for one chart, vanilla `<canvas>` everywhere else.
+Plain HTML, CSS, and JavaScript. No build step. Static-deploys to GitHub Pages from `main`. MathJax handles the small amount of notation, and the interactive widgets use vanilla DOM, SVG, and `<canvas>`.

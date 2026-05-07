@@ -65,7 +65,7 @@ window.CV = (function () {
   }
   function label(ctx, txt, x, y, color, size = 11) {
     ctx.fillStyle = color;
-    ctx.font = `500 ${size}px Inter, system-ui, sans-serif`;
+    ctx.font = `600 ${size}px "Source Sans 3", system-ui, sans-serif`;
     ctx.textBaseline = 'top';
     ctx.fillText(txt, x, y);
   }

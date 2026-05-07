@@ -70,6 +70,7 @@ window.W_flow = function init(root) {
   }
 
   function draw(ctx, W, H) {
+    if (W < 40 || H < 40) return;
     CV.clear(ctx, W, H, T['bg-soft']);
     const m = { l: 18, r: 18, t: 18, b: 18 };
     const cx = (W - m.l - m.r) / 2 + m.l, cy = (H - m.t - m.b) / 2 + m.t;
@@ -169,7 +170,7 @@ window.W_flow = function init(root) {
   }
   playBtn.addEventListener('click', () => {
     playing = !playing;
-    playBtn.textContent = playing ? '⏸ pause' : '▶ animate';
+    playBtn.textContent = playing ? 'Pause' : 'Animate';
     t0 = 0;
     cancelAnimationFrame(raf);
     if (playing) raf = requestAnimationFrame(loop);

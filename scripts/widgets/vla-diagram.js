@@ -42,7 +42,7 @@ window.W_vla = function init(root) {
       t.setAttribute('x', b.x + b.w / 2);
       t.setAttribute('y', b.y + b.h / 2 + (i - (lines.length - 1) / 2) * 14 + 4);
       t.setAttribute('text-anchor', 'middle');
-      t.setAttribute('font-family', 'Inter, system-ui, sans-serif');
+      t.setAttribute('font-family', 'Source Sans 3, system-ui, sans-serif');
       t.setAttribute('font-size', b.kind === 'a' ? 11 : 12);
       t.setAttribute('font-weight', b.kind === 'mid' ? 600 : 500);
       t.setAttribute('fill', textColor);

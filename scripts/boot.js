@@ -2,6 +2,10 @@
 // up the page-wide scroll-progress bar and lazy <video> loading so opening the
 // page is cheap.
 (function () {
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.PI07_PREFERS_REDUCED_MOTION = !!reduceMotion;
+
   const widgets = {
     'arm':           window.W_arm,
     'arm-multi':     window.W_arm_multi,
@@ -9,11 +13,12 @@
     'vla':           window.W_vla,
     'flow':          window.W_flow,
     'conflict':      window.W_conflict,
-    'prompt':        window.W_prompt,
+    'conditioning-lab': window.W_conditioning_lab,
+    'system-map':    window.W_system_map,
     'subgoal':       window.W_subgoal,
-    'compose':       window.W_compose,
-    'distill':       window.W_distill,
-    'scorecard':     window.W_scorecard
+    'air-fryer-lab': window.W_air_fryer_lab,
+    'embodiment-compare': window.W_embodiment_compare,
+    'results-explorer': window.W_results_explorer
   };
 
   const mounted = new WeakSet();
@@ -39,6 +44,14 @@
 
   document.querySelectorAll('[data-widget]').forEach(el => widgetIO.observe(el));
 
+  if (reduceMotion) {
+    document.querySelectorAll('video').forEach(v => {
+      v.autoplay = false;
+      v.removeAttribute('autoplay');
+      v.pause();
+    });
+  }
+
   // Lazy <video> sources. We keep the URL in data-lazy-src and only attach
   // when the section is near. Saves a lot of bandwidth on first paint.
   const videoIO = new IntersectionObserver((entries) => {
@@ -49,8 +62,10 @@
       if (src && !v.src) {
         v.src = src;
         v.load();
-        const tryPlay = () => v.play().catch(() => {});
-        v.addEventListener('canplay', tryPlay, { once: true });
+        if (!reduceMotion) {
+          const tryPlay = () => v.play().catch(() => {});
+          v.addEventListener('canplay', tryPlay, { once: true });
+        }
       }
       videoIO.unobserve(v);
     });
