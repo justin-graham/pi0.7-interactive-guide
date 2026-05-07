@@ -7,12 +7,16 @@
   window.PI07_PREFERS_REDUCED_MOTION = !!reduceMotion;
 
   const widgets = {
+    'jargon':        window.W_jargon_decoder,
     'arm':           window.W_arm,
+    'action-chunks': window.W_action_chunks,
     'arm-multi':     window.W_arm_multi,
     'bc':            window.W_bc,
+    'covariate-shift': window.W_covariate_shift,
     'vla':           window.W_vla,
     'flow':          window.W_flow,
     'conflict':      window.W_conflict,
+    'context-space': window.W_context_space,
     'conditioning-lab': window.W_conditioning_lab,
     'system-map':    window.W_system_map,
     'subgoal':       window.W_subgoal,

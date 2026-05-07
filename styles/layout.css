@@ -252,6 +252,14 @@ section.s p.takeaway::before {
 .s-grid .text,
 .s-grid .widget { min-width: 0; }
 
+.follow-grid {
+  margin-top: clamp(24px, 4vw, 42px);
+}
+
+.intro-copy {
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
 .full-band {
   max-width: none;
   border-top: 1px solid var(--ink);

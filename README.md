@@ -1,6 +1,8 @@
 # π0.7 Interactive Guide
 
-A static, interactive guide to Physical Intelligence's [π0.7](https://www.pi.website/blog/pi07) model. It starts from robot-policy foundations and builds toward diverse contextual prompting, visual subgoals, air-fryer composition, cross-embodiment transfer, and the paper's main result claims.
+A static, first-principles interactive guide to robot foundation models, using Physical Intelligence's [π0.7](https://www.pi.website/blog/pi07) as the capstone case study.
+
+The page now teaches the foundations before summarizing the release: observations, actions, policies, demonstrations, covariate shift, multimodality, action chunks, flow matching, VLA grounding, context, visual subgoals, and then π0.7's system diagram and demo evidence.
 
 This is a third-party explainer. PI's paper, blog post, figures, models, and demo media remain the source of truth. See [CREDITS.md](./CREDITS.md).
 
