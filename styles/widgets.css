@@ -17,6 +17,10 @@
   color: var(--olive);
   margin-bottom: 12px;
 }
+.w-eyebrow.title-case {
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 .w-row {
   display: flex;

@@ -206,6 +206,10 @@ section.s {
   border-top: 1px solid var(--line-soft);
 }
 
+section.s.primer-only {
+  padding-top: clamp(38px, 6vw, 72px);
+}
+
 section.s > h2 {
   font-family: var(--serif);
   font-weight: 400;
