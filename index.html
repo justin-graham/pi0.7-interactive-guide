@@ -29,7 +29,7 @@
 
   <nav class="topnav" aria-label="primary">
     <div class="topnav-inner">
-      <a class="brand" href="#top"><span class="pi">π</span><sub>0.7</sub> first principles</a>
+      <a class="brand" href="#top"><span class="pi">π</span><sub>0.7</sub> From First Principles</a>
       <div class="links">
         <a href="#foundations">Primer</a>
         <a href="#imitation">Imitation</a>
@@ -44,24 +44,14 @@
 
   <header class="hero" id="top">
     <div>
-      <div class="eyebrow">Interactive guide · robot learning from first principles</div>
-      <h1>How robots learn to act from pixels, language, and demonstrations.</h1>
-      <p class="lede">This is not a summary-first tour of π0.7. It builds the concepts underneath PI-style robot foundation models one at a time: policies, observations, demonstrations, action chunks, generative actions, context, and visual subgoals.</p>
-      <p class="lede">Once those pieces are in place, Physical Intelligence's π0.7 becomes easier to read: it is a vision-language-action policy made steerable by diverse context.</p>
-      <div class="hero-actions">
-        <a class="pill-link" href="#foundations">Start the walkthrough</a>
-        <a class="pill-link" href="#pi07-map">Jump to π0.7 map</a>
-      </div>
-      <div class="hero-meta">
-        <span>Every major idea has a toy model</span>
-        <span>Static GitHub Pages</span>
-        <span>Third-party explainer</span>
-      </div>
+      <h2>How robots learn to act from pixels, language, and demos.</h2>
+      <p class="lede">This builds the concepts underneath PI-style robot foundation models one at a time: policies, observations, demonstrations, action chunks, generative actions, context, and visual subgoals.</p>
+      <p class="lede">Once those pieces are in place, Physical Intelligence's π0.7 becomes easier to understand.</p>
     </div>
     <div class="hero-media">
       <div class="hero-video-frame">
         <video src="https://website.pi-asset.com/pi07/Pi07VFINAL.mp4" poster="https://www.pi.website/images/pi07/pi07-og.png" muted autoplay loop playsinline preload="auto" controls></video>
-        <div class="caption">π0.7 is the capstone case study. Video © Physical Intelligence.</div>
+        <div class="caption">π0.7 video © Physical Intelligence.</div>
       </div>
     </div>
   </header>
@@ -77,23 +67,22 @@
 
   <section class="s" id="policy">
     <div class="eyebrow">01 · Policy</div>
-    <h2>A policy is the robot's rule for choosing the next move.</h2>
+    <h2>A policy is the rule for choosing the next move.</h2>
     <div class="s-grid">
       <div class="text">
         <p>Write a policy as $\pi(a \mid o, c)$: choose an action $a$ from an observation $o$ and optional context $c$. The observation might be camera pixels and joint angles. The context might be a language instruction, robot type, or visual goal.</p>
-        <p>In the toy arm, you are the policy. You see the target and choose two joint angles. A learned robot policy does the same kind of mapping, but in a much larger action space.</p>
-        <p class="takeaway">The rest of the guide asks one question repeatedly: what information should the policy condition on before it acts?</p>
+        <p>In this interactive arm, you are the policy. You see the target and choose two joint angles. A learned robot policy does the same kind of mapping, but in a much larger action space.</p>
       </div>
       <div class="widget" data-widget="arm">
         <div class="w-card">
-          <div class="w-eyebrow">Policy game · you choose the action</div>
+          <div class="w-eyebrow">Interactive Policy</div>
           <canvas class="w-canvas" data-arm="canvas" aria-label="Two-joint robot arm visualization"></canvas>
           <div class="w-row" style="margin-top:14px">
-            <label>theta 1 <input type="range" class="w-slider" data-arm="theta1" min="-180" max="180" value="-30" step="1"></label>
+            <label>theta1 <input type="range" class="w-slider" data-arm="theta1" min="-180" max="180" value="-30" step="1"></label>
             <span class="val" data-arm="theta1-val">-30°</span>
           </div>
           <div class="w-row">
-            <label>theta 2 <input type="range" class="w-slider" data-arm="theta2" min="-160" max="160" value="80" step="1"></label>
+            <label>theta2 <input type="range" class="w-slider" data-arm="theta2" min="-160" max="160" value="80" step="1"></label>
             <span class="val" data-arm="theta2-val">80°</span>
           </div>
           <div class="w-row" style="margin-top:8px">
@@ -108,34 +97,33 @@
 
   <section class="s" id="actions">
     <div class="eyebrow">02 · Actions and chunks</div>
-    <h2>Robots usually need short behaviors, not isolated twitches.</h2>
+    <h2>Robots usually need a trajectory of behaviors.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>An action can be a single motor command, but manipulation often works better when the model emits a short chunk: a few future moves that belong together.</p>
-        <p>Move the chunk length. Single-step control reacts every frame and can jitter. Longer chunks commit to a local plan, which is why modern robot policies often predict continuous action chunks.</p>
-        <p class="takeaway">π0.7's action expert outputs continuous chunks, so it can express a small behavior like reach, grasp, lift, or press.</p>
+        <p>An action can be a single motor command, but manipulation often works better when the model emits a few future moves that belong together.</p>
+        <p>Move the chunk length. Single-step control reacts every frame and can jitter. Longer chunks commit to a local plan.</p>
       </div>
       <div class="widget" data-widget="action-chunks">
         <div class="w-card">
-          <div class="w-eyebrow">Action chunking · local plans</div>
+          <div class="w-eyebrow">Action Chunking</div>
           <canvas class="w-canvas" data-chunks="canvas" aria-label="Action chunk length comparison"></canvas>
           <div class="w-row" style="margin-top:14px">
-            <label>chunk length <input type="range" class="w-slider" data-chunks="len" min="1" max="10" value="4" step="1"></label>
+            <label>Chunk Length <input type="range" class="w-slider" data-chunks="len" min="1" max="10" value="4" step="1"></label>
             <span class="val" data-chunks="len-val">4</span>
             <button class="w-btn ghost" data-chunks="play">Animate</button>
             <button class="w-btn ghost" data-chunks="reset">Reset</button>
           </div>
-          <p class="w-caption">Yellow path = chunked local plan. Gray path = one-step reactive control under the same disturbance.</p>
+          <p class="w-caption">Yellow path = chunked local plan. Gray path = one-step control under the same disturbance.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="section-kicker" id="imitation">Part 1 · learning from demonstrations</div>
+  <span class="section-anchor" id="imitation" aria-hidden="true"></span>
 
-  <section class="s" id="demos">
+  <section class="s no-part-rule" id="demos">
     <div class="eyebrow">03 · Behavior cloning</div>
-    <h2>Imitation learning copies the action a demonstrator took.</h2>
+    <h2>Imitation learning copies a demo's actions.</h2>
     <div class="s-grid">
       <div class="text">
         <p>Behavior cloning records demonstrations and trains a model to predict the demonstrated action from the observation. It is the simplest bridge from data to policy.</p>
@@ -152,7 +140,7 @@
             <button class="w-btn ghost" data-bc="reset">Reset</button>
             <button class="w-btn ghost" data-bc="seed">Seed demos</button>
           </div>
-          <p class="w-caption">Yellow band = covered region. Outside it, the policy is guessing from weak evidence.</p>
+          <p class="w-caption">The yellow band is the covered region. Outside it, the policy is guessing from weak evidence.</p>
         </div>
       </div>
     </div>
@@ -208,9 +196,9 @@
     </div>
   </section>
 
-  <div class="section-kicker" id="generation">Part 2 · generative action models</div>
+  <span class="section-anchor" id="generation" aria-hidden="true"></span>
 
-  <section class="s" id="flow">
+  <section class="s no-part-rule" id="flow">
     <div class="eyebrow">06 · Flow matching</div>
     <h2>A generative policy turns noise into an action trajectory.</h2>
     <div class="s-grid">
@@ -258,9 +246,9 @@
     </div>
   </section>
 
-  <div class="section-kicker" id="context">Part 3 · context as the missing variable</div>
+  <span class="section-anchor" id="context" aria-hidden="true"></span>
 
-  <section class="s" id="naive">
+  <section class="s no-part-rule" id="naive">
     <div class="eyebrow">08 · Naive mixing</div>
     <h2>Broad robot data creates contradictions unless the model knows the source.</h2>
     <div class="s-grid">
@@ -350,9 +338,9 @@
     </div>
   </section>
 
-  <div class="section-kicker" id="pi07-map">Part 4 · now read π0.7</div>
+  <span class="section-anchor" id="pi07-map" aria-hidden="true"></span>
 
-  <section class="s full-band" id="system">
+  <section class="s full-band no-part-rule" id="system">
     <div class="eyebrow">11 · π0.7 system map</div>
     <h2>The blog diagram is the payoff: all the primitives join here.</h2>
     <div class="text intro-copy">
@@ -367,9 +355,9 @@
     </div>
   </section>
 
-  <div class="section-kicker" id="cases">Part 5 · π0.7 as case studies</div>
+  <span class="section-anchor" id="cases" aria-hidden="true"></span>
 
-  <section class="s" id="air-fryer">
+  <section class="s no-part-rule" id="air-fryer">
     <div class="eyebrow">12 · Compositional task</div>
     <h2>The air fryer is a test of context-guided recombination.</h2>
     <div class="s-grid">
