@@ -74,17 +74,44 @@ window.W_jargon_decoder = function init(root) {
           `).join('')}
         </div>
         <div class="primer-diagram" aria-live="polite">
-          <div class="loop-diagram" data-active="${term.id}">
-            <span class="loop-node obs">Observation</span>
-            <span class="loop-node ctx">Context</span>
-            <span class="loop-node pol">Policy</span>
-            <span class="loop-node act">Action</span>
-            <span class="loop-node world">World changes</span>
-            <span class="loop-line l1"></span>
-            <span class="loop-line l2"></span>
-            <span class="loop-line l3"></span>
-            <span class="loop-line l4"></span>
-          </div>
+          <svg class="loop-svg" data-active="${term.id}" viewBox="0 0 620 260" role="img" aria-label="Observation and context feed a policy; the policy emits an action; the action changes the world and creates the next observation.">
+            <defs>
+              <marker id="loop-arrow-olive" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+                <path d="M 0 0 L 12 6 L 0 12 z"></path>
+              </marker>
+              <marker id="loop-arrow-yellow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+                <path d="M 0 0 L 12 6 L 0 12 z"></path>
+              </marker>
+            </defs>
+
+            <path class="loop-edge olive" d="M194 64 C226 64 226 112 256 122"></path>
+            <path class="loop-edge olive" d="M194 196 C226 196 226 148 256 138"></path>
+            <path class="loop-edge yellow" d="M364 130 C398 130 402 64 430 64"></path>
+            <path class="loop-edge yellow" d="M497 90 L497 170"></path>
+            <path class="loop-edge olive" d="M430 196 C306 244 20 244 20 64 L60 64"></path>
+
+            <g class="loop-svg-node obs-node">
+              <rect class="node-rect" x="60" y="38" width="134" height="52"></rect>
+              <text x="127" y="69">Observation</text>
+            </g>
+            <g class="loop-svg-node context-node">
+              <rect class="node-rect" x="60" y="170" width="134" height="52"></rect>
+              <text x="127" y="201">Context</text>
+            </g>
+            <g class="loop-svg-node policy-node">
+              <rect class="node-rect" x="256" y="104" width="108" height="52"></rect>
+              <text x="310" y="135">Policy</text>
+            </g>
+            <g class="loop-svg-node action-node">
+              <rect class="node-rect" x="430" y="38" width="134" height="52"></rect>
+              <text x="497" y="69">Action</text>
+            </g>
+            <g class="loop-svg-node world-node">
+              <rect class="node-rect" x="430" y="170" width="134" height="52"></rect>
+              <text x="497" y="193">World</text>
+              <text x="497" y="208">changes</text>
+            </g>
+          </svg>
           <div class="primer-readout">
             <strong>${term.label}</strong>
             <span>${term.detail}</span>
