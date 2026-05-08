@@ -213,11 +213,11 @@ section.s.primer-only {
 section.s > h2 {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(32px, 4vw, 54px);
-  line-height: 1.06;
+  font-size: clamp(20px, 1.45vw, 23px);
+  line-height: 1.22;
   letter-spacing: 0;
-  margin: 12px 0 28px;
-  max-width: 18ch;
+  margin: 8px 0 22px;
+  max-width: 34ch;
 }
 
 section.s p {

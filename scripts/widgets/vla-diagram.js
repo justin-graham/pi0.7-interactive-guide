@@ -58,7 +58,6 @@ window.W_vla = function init(root) {
     return g;
   }
   function arrow(from, to, color = T['olive']) {
-    const g = document.createElementNS(ns, 'g');
     const path = document.createElementNS(ns, 'path');
     const x1 = from.x + from.w, y1 = from.y + from.h / 2;
     const x2 = to.x, y2 = to.y + to.h / 2;
@@ -68,8 +67,7 @@ window.W_vla = function init(root) {
     path.setAttribute('stroke', color);
     path.setAttribute('stroke-width', 1.5);
     path.setAttribute('marker-end', 'url(#vla-arrow)');
-    g.appendChild(path);
-    return g;
+    return path;
   }
   function showTip(text, e) {
     tip.textContent = text;
@@ -92,10 +90,18 @@ window.W_vla = function init(root) {
 
   // Connectors first so they go under blocks
   const byId = Object.fromEntries(blocks.map(b => [b.id, b]));
-  [
+  const routePaths = {};
+  const connectorPairs = [
     ['img', 'fuse'], ['lang', 'fuse'], ['state', 'fuse'],
     ['fuse', 'tr'], ['tr', 'act']
-  ].forEach(([a, b]) => svg.appendChild(arrow(byId[a], byId[b])));
+  ];
+  connectorPairs.forEach(([a, b]) => {
+    const path = arrow(byId[a], byId[b]);
+    const key = `${a}-${b}`;
+    path.dataset.route = key;
+    routePaths[key] = path;
+    svg.appendChild(path);
+  });
   // Action expert → action tokens (vertical drop)
   const drop = document.createElementNS(ns, 'path');
   drop.setAttribute('d', `M 460 160 L 460 195`);
@@ -105,18 +111,19 @@ window.W_vla = function init(root) {
   drop.setAttribute('marker-end', 'url(#vla-arrow)');
   svg.appendChild(drop);
 
-  // Blocks
-  blocks.forEach(b => svg.appendChild(rect(b)));
-
   // Animated tokens flowing along img→fuse→tr→act path
   const tokenG = document.createElementNS(ns, 'g');
   svg.appendChild(tokenG);
 
-  // Pre-compute three pseudo-paths per input
+  // Blocks sit above the flow dots, so tokens visually enter and exit modules.
+  blocks.forEach(b => svg.appendChild(rect(b)));
+
+  // Follow the same SVG paths drawn above. This keeps dots on curved connectors
+  // if the layout is adjusted later.
   const flowSpecs = [
-    { from: byId.img, hue: T['teal-deep'] },
-    { from: byId.lang, hue: T['rose'] },
-    { from: byId.state, hue: T['olive'] }
+    { route: ['img-fuse', 'fuse-tr', 'tr-act'], hue: T['teal-deep'] },
+    { route: ['lang-fuse', 'fuse-tr', 'tr-act'], hue: T['rose'] },
+    { route: ['state-fuse', 'fuse-tr', 'tr-act'], hue: T['olive'] }
   ];
   function spawnPulse(spec, delay) {
     const c = document.createElementNS(ns, 'circle');
@@ -129,25 +136,29 @@ window.W_vla = function init(root) {
       const t = (now - start) / 2400;
       if (t < 0) { requestAnimationFrame(frame); return; }
       if (t > 1) { c.remove(); return; }
-      const p = pulsePos(spec.from, t);
+      const p = pulsePos(spec.route, t);
       c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
   }
-  function pulsePos(from, t) {
-    // Three-leg path: from→fuse, fuse→tr, tr→act
-    const fuse = byId.fuse, tr = byId.tr, act = byId.act;
-    const p0 = { x: from.x + from.w, y: from.y + from.h / 2 };
-    const p1 = { x: fuse.x + fuse.w / 2, y: fuse.y + fuse.h / 2 };
-    const p2 = { x: tr.x + tr.w / 2, y: tr.y + tr.h / 2 };
-    const p3 = { x: act.x + act.w / 2, y: act.y + act.h / 2 };
-    const segs = [[p0, p1], [p1, p2], [p2, p3]];
-    const u = t * 3;
-    const seg = Math.min(2, Math.floor(u));
-    const k = u - seg;
-    const a = segs[seg][0], b = segs[seg][1];
-    return { x: M.lerp(a.x, b.x, k), y: M.lerp(a.y, b.y, k) };
+  function pulsePos(route, t) {
+    const segments = route.map(key => routePaths[key]).filter(Boolean);
+    const lengths = segments.map(path => path.getTotalLength());
+    const total = lengths.reduce((sum, length) => sum + length, 0);
+    let distance = M.clamp(t, 0, 1) * total;
+
+    for (let i = 0; i < segments.length; i += 1) {
+      if (distance <= lengths[i]) {
+        const point = segments[i].getPointAtLength(distance);
+        return { x: point.x, y: point.y };
+      }
+      distance -= lengths[i];
+    }
+
+    const last = segments[segments.length - 1];
+    const point = last.getPointAtLength(last.getTotalLength());
+    return { x: point.x, y: point.y };
   }
   let stopped = false;
   function tickPulses() {

@@ -657,35 +657,37 @@ button.w-btn.ghost {
 .map-branch {
   min-width: 128px;
   position: relative;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-self: stretch;
+  padding: 0 30px 0 22px;
 }
-.branch-spine {
+.branch-rail {
   position: absolute;
-  left: 46px;
-  top: 18%;
-  bottom: 18%;
-  width: 34px;
-  border-left: 34px solid var(--accent);
-  border-radius: 34px 0 0 34px;
-}
-.branch-arm {
-  position: absolute;
-  left: 46px;
-  right: 18px;
-  height: 34px;
+  left: 24px;
+  top: calc((100% - 32px) / 6);
+  bottom: calc((100% - 32px) / 6);
+  width: 22px;
   background: var(--accent);
+  border-radius: 999px;
 }
-.branch-arm::after {
+.branch-row {
+  position: relative;
+  align-self: center;
+  height: 26px;
+  background: var(--accent);
+  border-radius: 999px 0 0 999px;
+}
+.branch-row::after {
   content: "";
   position: absolute;
-  right: -30px;
-  top: -15px;
-  border-left: 30px solid var(--accent);
-  border-top: 32px solid transparent;
-  border-bottom: 32px solid transparent;
+  right: -28px;
+  top: -13px;
+  border-left: 28px solid var(--accent);
+  border-top: 26px solid transparent;
+  border-bottom: 26px solid transparent;
 }
-.arm-top { top: 20%; }
-.arm-mid { top: calc(50% - 17px); }
-.arm-bottom { bottom: 20%; }
 .map-outcomes {
   min-width: 230px;
   display: grid;

@@ -113,10 +113,10 @@ window.W_system_map = function init(root) {
         </div>
 
         <div class="map-branch" aria-hidden="true">
-          <span class="branch-spine"></span>
-          <span class="branch-arm arm-top"></span>
-          <span class="branch-arm arm-mid"></span>
-          <span class="branch-arm arm-bottom"></span>
+          <span class="branch-rail"></span>
+          <span class="branch-row"></span>
+          <span class="branch-row"></span>
+          <span class="branch-row"></span>
         </div>
 
         <div class="map-outcomes">
