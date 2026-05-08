@@ -112,11 +112,8 @@ window.W_system_map = function init(root) {
           </div>
         </div>
 
-        <div class="map-branch" aria-hidden="true">
-          <span class="branch-rail"></span>
-          <span class="branch-row"></span>
-          <span class="branch-row"></span>
-          <span class="branch-row"></span>
+        <div class="map-branch" data-system-map="branch" aria-hidden="true">
+          <svg class="map-branch-svg" data-system-map="branch-svg"></svg>
         </div>
 
         <div class="map-outcomes">
@@ -142,6 +139,7 @@ window.W_system_map = function init(root) {
     });
 
     setActive(active);
+    setupBranchLayout();
   }
 
   function node(id, title, body) {
@@ -196,6 +194,76 @@ window.W_system_map = function init(root) {
         <em>${note.why}</em>
       `;
     }
+  }
+
+  let cleanupBranchLayout = () => {};
+
+  function setupBranchLayout() {
+    cleanupBranchLayout();
+
+    const map = mount.querySelector('.pi-system-map');
+    const branch = mount.querySelector('[data-system-map="branch"]');
+    const svg = mount.querySelector('[data-system-map="branch-svg"]');
+    const outcomes = Array.from(mount.querySelectorAll('.map-outcome'));
+    if (!map || !branch || !svg || outcomes.length === 0) return;
+
+    let raf = 0;
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => drawBranch(branch, svg, outcomes));
+    };
+    const ro = new ResizeObserver(schedule);
+    [map, branch, ...outcomes].forEach(element => ro.observe(element));
+    window.addEventListener('resize', schedule, { passive: true });
+    cleanupBranchLayout = () => {
+      ro.disconnect();
+      window.removeEventListener('resize', schedule);
+      cancelAnimationFrame(raf);
+    };
+    schedule();
+  }
+
+  function drawBranch(branch, svg, outcomes) {
+    const T = CV.tokens();
+    const branchRect = branch.getBoundingClientRect();
+    const width = Math.max(1, branchRect.width);
+    const height = Math.max(1, branchRect.height);
+    const geometry = outcomes
+      .map(outcome => {
+        const rect = outcome.getBoundingClientRect();
+        return {
+          y: rect.top + rect.height / 2 - branchRect.top,
+          left: rect.left - branchRect.left
+        };
+      })
+      .filter(item => Number.isFinite(item.y) && Number.isFinite(item.left));
+    if (geometry.length === 0) return;
+
+    const railX = 26;
+    const strokeWidth = 26;
+    const headLength = 34;
+    const headHalfHeight = 29;
+    const tipGap = 10;
+    const svgWidth = Math.max(width, Math.max(...geometry.map(item => item.left)));
+    const centers = geometry.map(item => item.y);
+    const railTop = Math.min(...centers);
+    const railBottom = Math.max(...centers);
+
+    svg.style.width = `${svgWidth}px`;
+    svg.style.height = `${height}px`;
+    svg.setAttribute('viewBox', `0 0 ${svgWidth} ${height}`);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.innerHTML = `
+      <path class="map-branch-rail" d="M ${railX} ${railTop} V ${railBottom}" fill="none" stroke="${T.accent}" stroke-width="${strokeWidth}" stroke-linecap="round"></path>
+      ${geometry.map(item => {
+        const tipX = Math.max(railX + headLength + 24, item.left - tipGap);
+        const baseX = tipX - headLength;
+        return `
+        <path class="map-branch-arm" d="M ${railX} ${item.y} H ${baseX}" fill="none" stroke="${T.accent}" stroke-width="${strokeWidth}" stroke-linecap="round"></path>
+        <polygon class="map-branch-head" points="${baseX},${item.y - headHalfHeight} ${tipX},${item.y} ${baseX},${item.y + headHalfHeight}" fill="${T.accent}"></polygon>
+      `;
+      }).join('')}
+    `;
   }
 
   render();
