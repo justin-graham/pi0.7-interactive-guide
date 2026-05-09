@@ -45,8 +45,9 @@
   <header class="hero" id="top">
     <div>
       <h2>How robots learn to act from pixels, language, and demos.</h2>
-      <p class="lede">This builds the concepts underneath PI-style robot foundation models one at a time: policies, observations, demonstrations, action chunks, generative actions, context, and visual subgoals.</p>
-      <p class="lede">Once those pieces are in place, Physical Intelligence's π0.7 becomes easier to understand.</p>
+      <p class="lede">This guide builds the concepts underneath PI-style robot foundation models one at a time: policies, observations, demonstrations, action chunks, generative actions, context, and visual subgoals.
+        Once those pieces are in place, Physical Intelligence's π0.7 becomes easier to understand.
+      </p>
     </div>
     <div class="hero-media">
       <div class="hero-video-frame">
@@ -148,25 +149,25 @@
 
   <section class="s" id="shift">
     <div class="eyebrow">04 · Covariate shift</div>
-    <h2>Small imitation errors can move the robot off the demo path.</h2>
+    <h2>Small imitation errors matter.</h2>
     <div class="s-grid">
       <div class="text">
         <p>A policy trained only on expert states may not know what to do after its own mistake. One slight miss changes the next observation, which can cause the next action to be worse.</p>
-        <p>Step the rollout. The yellow band is the demonstration corridor. The learned policy is fine inside it, but becomes less reliable as the state drifts away.</p>
-        <p class="takeaway">This is why broad data, recovery data, and good context matter: the robot has to act in the world it creates, not only the world in the demonstrations.</p>
+        <p>The yellow band is the demonstration corridor. The learned policy is fine inside it, but becomes less reliable as the state drifts away.</p>
+        <p class="takeaway">This is why broad data and good context matter: the robot has to act in the real world.</p>
       </div>
       <div class="widget" data-widget="covariate-shift">
         <div class="w-card">
-          <div class="w-eyebrow">Rollout sandbox · stay near the demos</div>
+          <div class="w-eyebrow">Stay near the demos</div>
           <canvas class="w-canvas" data-shift="canvas" aria-label="Covariate shift rollout demo"></canvas>
           <div class="w-row" style="margin-top:14px">
-            <label>policy <select class="w-select" data-shift="mode"><option value="clean">clean clone</option><option value="noisy" selected>noisy clone</option><option value="recover">clone + recovery</option></select></label>
+            <label>Policy <select class="w-select" data-shift="mode"><option value="clean">Clean Clone</option><option value="noisy" selected>Noisy Clone</option><option value="recover">Clone + Recovery</option></select></label>
             <button class="w-btn ghost" data-shift="step">Step</button>
             <button class="w-btn ghost" data-shift="run">Run</button>
             <button class="w-btn ghost" data-shift="reset">Reset</button>
             <span class="val" data-shift="score">on track</span>
           </div>
-          <p class="w-caption">The learned policy only sees states near the yellow demonstration corridor unless recovery data fills in the edges.</p>
+          <p class="w-caption">The learned policy only sees states near the yellow demonstration corridor unless more robust data fills in the edges.</p>
         </div>
       </div>
     </div>
@@ -174,23 +175,20 @@
 
   <section class="s" id="multimodal">
     <div class="eyebrow">05 · Multimodality</div>
-    <h2>One observation can have several correct futures.</h2>
+    <h2>One observation has several correct futures.</h2>
     <div class="s-grid">
       <div class="text">
         <p>Human demonstrators do not move identically. One reaches high, another curls around an obstacle, and both can be right. If a model averages those choices, the result can be a motion no demonstrator actually used.</p>
-        <p>The toy arm shows three valid trajectories to the same target. The correct lesson is not "pick the average"; it is "represent the choices."</p>
-        <p class="takeaway">Robot action data is multimodal. Good policies need to sample a plausible behavior mode, not collapse all modes into one mean action.</p>
       </div>
       <div class="widget" data-widget="arm-multi">
         <div class="w-card">
           <div class="w-eyebrow">Three valid trajectories</div>
           <canvas class="w-canvas" data-armmulti="canvas" aria-label="Multiple valid arm trajectories"></canvas>
           <div class="w-row" style="margin-top:14px">
-            <label>playback <input type="range" class="w-slider" data-armmulti="t" min="0" max="100" value="0" step="1"></label>
+            <label>Playback <input type="range" class="w-slider" data-armmulti="t" min="0" max="100" value="0" step="1"></label>
             <button class="w-btn ghost" data-armmulti="play">Play</button>
             <button class="w-btn ghost" data-armmulti="newtarget">New target</button>
           </div>
-          <p class="w-caption">Averaging the paths would trace a path that belongs to none of the demonstrations.</p>
         </div>
       </div>
     </div>
@@ -200,7 +198,6 @@
 
   <section class="s no-part-rule" id="flow">
     <div class="eyebrow">06 · Flow matching</div>
-    <h2>A generative policy turns noise into an action trajectory.</h2>
     <div class="s-grid">
       <div class="text">
         <p>Instead of regressing to one averaged action, a flow-matching policy learns a vector field over action space. At inference time, it starts from noise and follows the field toward a plausible action chunk.</p>
@@ -217,11 +214,11 @@
             <button class="w-btn ghost" data-flow="play">Animate</button>
           </div>
           <div class="w-row">
-            <label>modes <input type="range" class="w-slider" data-flow="modes" min="1" max="4" value="3" step="1"></label>
+            <label>Modes <input type="range" class="w-slider" data-flow="modes" min="1" max="4" value="3" step="1"></label>
             <span class="val" data-flow="modes-val">3</span>
             <button class="w-btn ghost" data-flow="reseed">Re-seed</button>
           </div>
-          <p class="w-caption">Yellow dots are action samples being transported toward distinct behavior modes.</p>
+          <p class="w-caption">Yellow dots are action samples being transported toward behavior modes.</p>
         </div>
       </div>
     </div>
@@ -229,18 +226,15 @@
 
   <section class="s" id="vla">
     <div class="eyebrow">07 · Vision-language-action</div>
-    <h2>A VLA grounds semantic knowledge into robot motion.</h2>
+    <h2>A VLA grounds semantic knowledge.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>A vision-language model knows visual and semantic concepts: drawers, handles, shirts, buttons. A vision-language-action model adds the ability to output robot actions.</p>
-        <p>The important bridge is grounding. The model cannot just say "open the drawer"; it has to convert that phrase and image into continuous motion.</p>
-        <p class="takeaway">π0.7 can be read as a VLA backbone plus an action expert, trained so language, images, and context steer the same policy.</p>
+        <p>A vision-language model knows visual and semantic concepts. A vision-language-action model adds the ability to output robot actions.</p>
       </div>
       <div class="widget" data-widget="vla">
         <div class="w-card">
           <div class="w-eyebrow">VLA forward pass · hover blocks</div>
           <svg class="w-canvas" data-vla="svg" viewBox="0 0 520 280" style="aspect-ratio:520/280" aria-label="VLA architecture diagram"></svg>
-          <p class="w-caption">Images and instruction enter together. The action expert emits continuous chunks, not text tokens.</p>
         </div>
       </div>
     </div>
@@ -250,10 +244,9 @@
 
   <section class="s no-part-rule" id="naive">
     <div class="eyebrow">08 · Naive mixing</div>
-    <h2>Broad robot data creates contradictions unless the model knows the source.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>The obvious recipe is to mix demonstrations from every robot and train one policy. The problem is that similar observations can require different actions because robot bodies, grippers, control interfaces, and strategies differ.</p>
+        <p>The recipe is to mix demonstrations from every robot and train one policy. The problem is that similar observations can require different actions because robot bodies, grippers, control interfaces, and strategies differ.</p>
         <p>Turn on the context label. The same data stops looking contradictory because the model is told which behavior mode it should imitate.</p>
         <p class="takeaway">A generalist needs broad data, but it also needs context that explains how each behavior should be interpreted.</p>
       </div>
@@ -266,7 +259,6 @@
             <span class="track"></span>
             <span>add context label</span>
           </label>
-          <p class="w-caption">Off: the model averages conflicting demonstrations. On: context separates the modes.</p>
         </div>
       </div>
     </div>
@@ -274,11 +266,9 @@
 
   <section class="s full-band" id="conditioning">
     <div class="eyebrow">09 · Context coordinates</div>
-    <h2>Context locates the behavior you want inside a large policy.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>Think of context as coordinates. Language says the semantic goal. Embodiment or control metadata says which robot and interface. Quality and speed tags say which style of behavior to prefer. Visual subgoals say where the scene should go next.</p>
-        <p>PI's phrase for π0.7 is <strong>diverse context</strong>. The point is not extra decoration around the prompt; it is the variable that makes broad robot data trainable and the final policy steerable.</p>
+        <p>Think of context as coordinates. Language says the semantic goal. Embodiment or control metadata says which robot and which interface. Quality and speed tags say which style of behavior to prefer. Visual subgoals say where the scene should go next. PI's phrase for π0.7 is diverse context.</p>
         <p class="takeaway">A steerable model is a conditional model: change the coordinates, change the behavior without changing the checkpoint.</p>
       </div>
       <div class="widget" data-widget="context-space">
@@ -292,13 +282,12 @@
     </div>
     <div class="s-grid follow-grid">
       <div class="text">
-        <p>The smaller lab shows the same idea as prompt pieces. Toggle each channel and watch which ambiguity disappears.</p>
+        <p>Toggle each channel and watch which ambiguity disappears.</p>
       </div>
       <div class="widget" data-widget="conditioning-lab">
         <div class="w-card">
-          <div class="w-eyebrow">Prompt pieces · ambiguity resolver</div>
+          <div class="w-eyebrow">Prompt Pieces</div>
           <div data-conditioning="root"></div>
-          <p class="w-caption">Toggle each channel to see which ambiguity it removes from the policy input.</p>
         </div>
       </div>
     </div>
@@ -306,7 +295,6 @@
 
   <section class="s" id="subgoals">
     <div class="eyebrow">10 · Visual subgoals</div>
-    <h2>A world model can turn a task into a target image.</h2>
     <div class="s-grid">
       <div class="text">
         <p>Some spatial instructions are easier to show than to say. A lightweight world model can predict what the scene should look like next, and the action policy can act toward that target image.</p>
@@ -319,20 +307,19 @@
           <div class="w-pair">
             <div>
               <img data-sub="cur" alt="Current frame">
-              <p class="w-caption" style="text-align:center">current</p>
+              <p class="w-caption" style="text-align:center">Current</p>
             </div>
             <div class="arrow">→</div>
             <div>
               <img data-sub="goal" alt="Predicted visual subgoal frame">
-              <p class="w-caption" style="text-align:center">subgoal</p>
+              <p class="w-caption" style="text-align:center">Subgoal</p>
             </div>
           </div>
           <div class="w-row" style="margin-top:14px">
             <button class="w-btn" data-sub="step">Step</button>
             <button class="w-btn ghost" data-sub="reset">Reset</button>
-            <span class="val" data-sub="idx">step 1 / 5</span>
+            <span class="val" data-sub="idx">Step 1 / 5</span>
           </div>
-          <p class="w-caption">Frames are hotlinked from PI's public π0.7 post.</p>
         </div>
       </div>
     </div>
@@ -342,15 +329,13 @@
 
   <section class="s full-band no-part-rule" id="system">
     <div class="eyebrow">11 · π0.7 system map</div>
-    <h2>The blog diagram is the payoff: all the primitives join here.</h2>
     <div class="text intro-copy">
       <p>Training-time context teaches the model how to interpret broad robot data. Inference-time context steers the same checkpoint toward a desired behavior. The action expert grounds that context into continuous action chunks.</p>
     </div>
     <div class="widget system-map-widget" data-widget="system-map">
       <div class="w-card pi-map-card">
-        <div class="w-eyebrow">System map · adapted from PI's public blog figure</div>
+        <div class="w-eyebrow">System Map</div>
         <div data-system-map="root"></div>
-        <p class="w-caption">This redraws the blog diagram as a responsive guide. Decorative video thumbnails use PI's public demo clips; the source blog and paper remain the source of truth.</p>
       </div>
     </div>
   </section>
@@ -359,19 +344,13 @@
 
   <section class="s no-part-rule" id="air-fryer">
     <div class="eyebrow">12 · Compositional task</div>
-    <h2>The air fryer is a test of context-guided recombination.</h2>
     <div class="s-grid">
-      <div class="text">
-        <p>The model has related primitives: open hinged objects, grasp handles, place food, press buttons. The unfamiliar part is arranging those primitives for this appliance.</p>
-        <p>Move through the tabs. Plain language gets partway there. More explicit substeps and visual subgoals make the same policy easier to steer.</p>
-        <p class="takeaway">The concept to notice is not magic novelty. It is conditional composition: known skills arranged by context.</p>
-      </div>
       <div class="widget" data-widget="air-fryer-lab">
         <div class="w-card">
           <div class="w-eyebrow">Air-fryer progression</div>
           <div class="lab-tabs" data-airfryer="tabs"></div>
           <div data-airfryer="stage"></div>
-          <p class="w-caption">Videos © Physical Intelligence, hotlinked from PI's public CDN.</p>
+          <p class="w-caption">Videos © Physical Intelligence.</p>
         </div>
       </div>
     </div>
@@ -379,19 +358,16 @@
 
   <section class="s" id="embodiment">
     <div class="eyebrow">13 · Embodiment</div>
-    <h2>Transfer means mapping a task onto a different body.</h2>
+    <h2>Mapping a task onto a different body.</h2>
     <div class="s-grid">
       <div class="text">
         <p>The UR5e example is not just language following. The robot body changes: size, inertia, gripper geometry, and teleoperation difficulty all shift.</p>
-        <p>That is why embodiment is a context variable. The policy has to solve the same task through a different physical interface.</p>
-        <p class="takeaway">Cross-embodiment transfer is the robotics version of analogy: same goal, different body, adapted strategy.</p>
       </div>
       <div class="widget" data-widget="embodiment-compare">
         <div class="w-card">
           <div class="w-eyebrow">Source robot vs target robot</div>
           <div class="comparison-grid" data-embodiment="videos"></div>
           <div style="margin-top:14px" data-embodiment="callouts"></div>
-          <p class="w-caption">Source and UR5e videos © Physical Intelligence.</p>
         </div>
       </div>
     </div>
@@ -399,15 +375,13 @@
 
   <section class="s full-band" id="results">
     <div class="eyebrow">14 · Evidence checklist</div>
-    <h2>Use the paper figures to check the concepts, not to memorize bars.</h2>
     <div class="s-grid">
       <div class="text">
         <p>The original paper has the quantitative figures. This compact explorer links each result back to the concept it stress-tests: dexterity, instruction following, and cross-embodiment transfer.</p>
-        <p class="takeaway">If the guide worked, the results should now read as tests of conditional robot policies, not isolated demos.</p>
       </div>
       <div class="widget" data-widget="results-explorer">
         <div class="w-card">
-          <div class="w-eyebrow">Source-backed figure guide</div>
+          <div class="w-eyebrow">Figure guide</div>
           <div class="lab-tabs" data-results="tabs"></div>
           <div data-results="panel"></div>
         </div>
@@ -417,12 +391,11 @@
 
   <section class="s" id="limits">
     <div class="eyebrow">15 · Limits</div>
-    <h2>Foundation does not mean solved.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>Unseen tasks remain harder than familiar task families, and broad datasets make it difficult to prove that a behavior is entirely novel rather than a new combination of related experience.</p>
-        <p>The next frontier is a policy that can plan, act, observe, and revise over long horizons with the same reliability that it executes short chunks.</p>
-        <p class="takeaway">π0.7 is best read as a strong step toward steerable robot foundation models, not as the end of robotics.</p>
+        <p>Unseen tasks remain harder than familiar task families, and broad datasets make it difficult to prove that a behavior is entirely novel rather than a new combination of related experience.
+          The next frontier is a policy that can plan, act, observe, and revise over long horizons with the same reliability that it executes short chunks.
+        </p>
       </div>
       <div class="widget">
         <div class="w-card">
@@ -439,12 +412,7 @@
 
   <section class="s" id="paper">
     <div class="eyebrow">16 · Source material</div>
-    <h2>Go to PI for the full paper, figures, and demo context.</h2>
     <div class="s-grid">
-      <div class="text">
-        <p>This is a third-party learning artifact. It paraphrases PI's public release and uses PI's public demo media with attribution.</p>
-        <p>The full paper is the source of truth for architecture details, training mixtures, ablations, and quantitative results.</p>
-      </div>
       <div class="widget">
         <div class="ref-card">
           <h3>π0.7 source links</h3>
@@ -460,20 +428,18 @@
             <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">PI blog</a>
             <a href="CREDITS.md" target="_blank">Credits</a>
           </div>
-          <p class="w-caption">Not affiliated with Physical Intelligence.</p>
         </div>
       </div>
     </div>
   </section>
 
   <footer class="foot">
-    <div>Built as a static first-principles explainer for GitHub Pages.</div>
     <div>
       <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">PI blog</a>
       ·
       <a href="assets/pi07.pdf" target="_blank" rel="noopener">PDF</a>
       ·
-      <a href="CREDITS.md" target="_blank">Credits</a>
+      <a href="https://www.raindroprace.com/contact" target="_blank" rel="noopener">Connect With Me</a>
     </div>
   </footer>
 

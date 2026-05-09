@@ -630,10 +630,7 @@ button.w-btn.ghost {
   content: "";
   position: absolute;
   left: 50%;
-  top: -8px;
-  bottom: -8px;
   width: 14px;
-  border-radius: 999px;
   transform: translateX(-50%);
 }
 .map-connector::after {
@@ -646,9 +643,19 @@ button.w-btn.ghost {
 }
 .map-connector.yellow::before { background: var(--accent); }
 .map-connector.olive::before { background: var(--olive-soft); }
+.map-connector.down::before {
+  top: -8px;
+  bottom: 12px;
+  border-radius: 999px 999px 0 0;
+}
 .map-connector.down::after {
   bottom: -12px;
   border-top: 28px solid var(--accent);
+}
+.map-connector.up::before {
+  top: 12px;
+  bottom: -8px;
+  border-radius: 0 0 999px 999px;
 }
 .map-connector.up::after {
   top: -12px;
