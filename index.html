@@ -98,23 +98,23 @@
 
   <section class="s" id="actions">
     <div class="eyebrow">02 · Actions and chunks</div>
-    <h2>Robots usually need a trajectory of behaviors.</h2>
+    <h2>A trajectory is a sequence of future poses through time.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>An action can be a single motor command, but manipulation often works better when the model emits a few future moves that belong together.</p>
-        <p>Move the chunk length. Single-step control reacts every frame and can jitter. Longer chunks commit to a local plan.</p>
+        <p>A trajectory is not one twitch. It is an ordered set of future poses: where the gripper should be now, next, and after that.</p>
+        <p>Move the chunk length. Short chunks replan constantly; longer chunks ask the policy to predict more future poses together.</p>
       </div>
       <div class="widget" data-widget="action-chunks">
         <div class="w-card">
-          <div class="w-eyebrow">Action Chunking</div>
-          <canvas class="w-canvas" data-chunks="canvas" aria-label="Action chunk length comparison"></canvas>
+          <div class="w-eyebrow">Trajectory chunks</div>
+          <canvas class="w-canvas" data-chunks="canvas" aria-label="Action chunk trajectory grouping"></canvas>
           <div class="w-row" style="margin-top:14px">
             <label>Chunk Length <input type="range" class="w-slider" data-chunks="len" min="1" max="10" value="4" step="1"></label>
             <span class="val" data-chunks="len-val">4</span>
             <button class="w-btn ghost" data-chunks="play">Animate</button>
             <button class="w-btn ghost" data-chunks="reset">Reset</button>
           </div>
-          <p class="w-caption">Yellow path = chunked local plan. Gray path = one-step control under the same disturbance.</p>
+          <p class="w-caption">Move Chunk Length. Yellow waypoints are the future poses predicted together at the current moment.</p>
         </div>
       </div>
     </div>
@@ -200,14 +200,14 @@
     <div class="eyebrow">06 · Flow matching</div>
     <div class="s-grid">
       <div class="text">
-        <p>Instead of regressing to one averaged action, a flow-matching policy learns a vector field over action space. At inference time, it starts from noise and follows the field toward a plausible action chunk.</p>
-        <p>The visualization is two-dimensional. In a robot model, the points are short continuous action sequences, conditioned on the observation and context.</p>
-        <p class="takeaway">Flow matching gives the policy a way to keep multiple behavior modes separate while still producing smooth continuous actions.</p>
+        <p>Flow matching starts with noisy candidate action chunks and learns how to transform them into plausible robot motions.</p>
+        <p>Here each line is a whole future gripper trajectory around the obstacle, not a single point. Move t from noise to clean motion.</p>
+        <p class="takeaway">The model can keep several futures separate while still producing smooth continuous action chunks.</p>
       </div>
       <div class="widget" data-widget="flow">
         <div class="w-card">
-          <div class="w-eyebrow">Noise to action data</div>
-          <canvas class="w-canvas" data-flow="canvas" aria-label="Flow matching vector field"></canvas>
+          <div class="w-eyebrow">Noisy chunks to robot motions</div>
+          <canvas class="w-canvas" data-flow="canvas" aria-label="Flow matching denoising candidate robot trajectories"></canvas>
           <div class="w-row" style="margin-top:14px">
             <label>t <input type="range" class="w-slider" data-flow="t" min="0" max="100" value="0" step="1"></label>
             <span class="val" data-flow="t-val">0.00</span>
@@ -218,7 +218,7 @@
             <span class="val" data-flow="modes-val">3</span>
             <button class="w-btn ghost" data-flow="reseed">Re-seed</button>
           </div>
-          <p class="w-caption">Yellow dots are action samples being transported toward behavior modes.</p>
+          <p class="w-caption">Move t to denoise the candidate chunks. Modes changes how many valid futures are visible.</p>
         </div>
       </div>
     </div>
@@ -246,7 +246,7 @@
     <div class="eyebrow">08 · Naive mixing</div>
     <div class="s-grid">
       <div class="text">
-        <p>The recipe is to mix demonstrations from every robot and train one policy. The problem is that similar observations can require different actions because robot bodies, grippers, control interfaces, and strategies differ.</p>
+        <p>Physical Intelligence's recipe is to mix demonstrations from every robot and train one policy. The problem is that similar observations can require different actions because robot bodies, grippers, control interfaces, and strategies differ.</p>
         <p>Turn on the context label. The same data stops looking contradictory because the model is told which behavior mode it should imitate.</p>
         <p class="takeaway">A generalist needs broad data, but it also needs context that explains how each behavior should be interpreted.</p>
       </div>
@@ -435,10 +435,6 @@
 
   <footer class="foot">
     <div>
-      <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">PI blog</a>
-      ·
-      <a href="assets/pi07.pdf" target="_blank" rel="noopener">PDF</a>
-      ·
       <a href="https://www.raindroprace.com/contact" target="_blank" rel="noopener">Connect With Me</a>
     </div>
   </footer>
