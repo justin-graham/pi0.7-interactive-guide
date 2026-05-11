@@ -118,7 +118,7 @@ window.W_flow = function init(root) {
       const y = m.t + (H - m.t - m.b) * i / 4;
       CV.line(ctx, m.l, y, W - m.r, y, T['line-soft']);
     }
-    CV.label(ctx, 'candidate future robot motions', m.l + 8, m.t + 7, T['olive'], 11);
+    CV.label(ctx, '', m.l + 8, m.t + 7, T['olive'], 11);
   }
 
   function drawObstacle(ctx, px, py) {

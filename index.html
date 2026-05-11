@@ -98,11 +98,9 @@
 
   <section class="s" id="actions">
     <div class="eyebrow">02 · Actions and chunks</div>
-    <h2>A trajectory is a sequence of future poses through time.</h2>
     <div class="s-grid">
       <div class="text">
-        <p>A trajectory is not one twitch. It is an ordered set of future poses: where the gripper should be now, next, and after that.</p>
-        <p>Move the chunk length. Short chunks replan constantly; longer chunks ask the policy to predict more future poses together.</p>
+        <p>A trajectory is a sequence of future poses through time. In the graphic below, move the chunk length. Short chunks replan constantly; longer chunks ask the policy to predict more future poses together.</p>
       </div>
       <div class="widget" data-widget="action-chunks">
         <div class="w-card">
@@ -114,7 +112,6 @@
             <button class="w-btn ghost" data-chunks="play">Animate</button>
             <button class="w-btn ghost" data-chunks="reset">Reset</button>
           </div>
-          <p class="w-caption">Move Chunk Length. Yellow waypoints are the future poses predicted together at the current moment.</p>
         </div>
       </div>
     </div>
@@ -201,7 +198,6 @@
     <div class="s-grid">
       <div class="text">
         <p>Flow matching starts with noisy candidate action chunks and learns how to transform them into plausible robot motions.</p>
-        <p>Here each line is a whole future gripper trajectory around the obstacle, not a single point. Move t from noise to clean motion.</p>
         <p class="takeaway">The model can keep several futures separate while still producing smooth continuous action chunks.</p>
       </div>
       <div class="widget" data-widget="flow">
@@ -218,7 +214,6 @@
             <span class="val" data-flow="modes-val">3</span>
             <button class="w-btn ghost" data-flow="reseed">Re-seed</button>
           </div>
-          <p class="w-caption">Move t to denoise the candidate chunks. Modes changes how many valid futures are visible.</p>
         </div>
       </div>
     </div>
@@ -410,32 +405,11 @@
     </div>
   </section>
 
-  <section class="s" id="paper">
-    <div class="eyebrow">16 · Source material</div>
-    <div class="s-grid">
-      <div class="widget">
-        <div class="ref-card">
-          <h3>π0.7 source links</h3>
-          <pre class="cite">@misc{pi07_2026,
-  title  = {π0.7: A Steerable Model with Emergent Capabilities},
-  author = {Physical Intelligence},
-  year   = {2026},
-  url    = {https://www.pi.website/blog/pi07}
-}</pre>
-          <div class="ref-links">
-            <a href="assets/pi07.pdf" target="_blank" rel="noopener">Paper PDF</a>
-            <a href="https://www.pi.website/download/pi07.pdf" target="_blank" rel="noopener">Original PDF</a>
-            <a href="https://www.pi.website/blog/pi07" target="_blank" rel="noopener">PI blog</a>
-            <a href="CREDITS.md" target="_blank">Credits</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <footer class="foot">
     <div>
       <a href="https://www.raindroprace.com/contact" target="_blank" rel="noopener">Connect With Me</a>
+      ·
+      <a href="CREDITS.md" target="_blank" rel="noopener">Credits</a>
     </div>
   </footer>
 
